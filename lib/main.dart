@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_programming_final_project/view/expenseTracker/ExpenseTrackerHome.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       ),
       routes:{
         "/":(context)=>const MyHomePage(title: 'Team One Final project'),
-
+  "/expense":(context)=>const Expensetrackerhome(),
       } ,
     );
   }

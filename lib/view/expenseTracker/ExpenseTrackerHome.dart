@@ -15,6 +15,7 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
 
   List<Expense> expenseList = [];
   String? selectedCategory;
+  String? selectedpayment;
   DateTime? selectedDate; // Stores selected date
 
   final List<String> categories = [
@@ -46,6 +47,7 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
       setState(() {
         expenseList.add(Expense(
           _nameController.text,
+          selectedpayment!,
           selectedCategory ?? "Others",
           double.parse(_amountController.text),
           selectedDate!,
@@ -76,7 +78,25 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
                 decoration: InputDecoration(labelText: "Name"),
                 keyboardType: TextInputType.text,
                 validator: (value) =>
-                value!.isEmpty ? "Enter an expense name" : null,
+                    value!.isEmpty ? "Enter an expense name" : null,
+              ),
+              DropdownButtonFormField<String>(
+                value: selectedCategory,
+                decoration:
+                    InputDecoration(labelText: "Select a payment method"),
+                items: ["cash", "Credit Card"].map((payment) {
+                  return DropdownMenuItem(
+                    value: payment,
+                    child: Text(payment),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedpayment = value;
+                  });
+                },
+                validator: (value) =>
+                    value == null ? "Select a payment method" : null,
               ),
               DropdownButtonFormField<String>(
                 value: selectedCategory,
@@ -93,7 +113,7 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
                   });
                 },
                 validator: (value) =>
-                value == null ? "Select a category" : null,
+                    value == null ? "Select a category" : null,
               ),
               TextFormField(
                 controller: _amountController,
@@ -102,6 +122,7 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
                 validator: (value) => value!.isEmpty ? "Enter amount" : null,
               ),
               SizedBox(height: 10),
+
               TextFormField(
                 readOnly: true,
                 decoration: InputDecoration(
@@ -111,14 +132,16 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
                     onPressed: () => _pickDate(context),
                   ),
                 ),
+
                 controller: TextEditingController(
                   text: selectedDate == null
                       ? ""
-                      : DateFormat.yMMMd().format(selectedDate!),
+                      : DateFormat.yMMMd().format(selectedDate!).toString(),
                 ),
                 validator: (value) =>
-                selectedDate == null ? "Select a date" : null,
+                    selectedDate == null ? "Select a date" : null,
               ),
+
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _addExpense,
@@ -147,29 +170,30 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
       body: expenseList.isEmpty
           ? Center(child: Text("No expenses added yet!"))
           : ListView.builder(
-        itemCount: expenseList.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              title: Text(expenseList[index].name),
-              subtitle: Text(
-                "${expenseList[index].category} - \$${expenseList[index].price.toStringAsFixed(2)}\n"
-                    "Date: ${DateFormat.yMMMd().format(expenseList[index].date)}",
-              ),
-              trailing: Icon(Icons.arrow_forward),
+              itemCount: expenseList.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: ListTile(
+                    title: Text(expenseList[index].name),
+                    subtitle: Text(
+                      "${expenseList[index].category} - \$${expenseList[index].price.toStringAsFixed(2)}\n"
+                      "Date: ${DateFormat.yMMMd().format(expenseList[index].date)} \n${expenseList[index].payment}",
+                    ),
+                    trailing: Icon(Icons.arrow_forward),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }
 
 class Expense {
   String name;
+  String payment;
   String category;
   double price;
   DateTime date;
 
-  Expense(this.name, this.category, this.price, this.date);
+  Expense(this.name,this.payment, this.category, this.price, this.date);
 }

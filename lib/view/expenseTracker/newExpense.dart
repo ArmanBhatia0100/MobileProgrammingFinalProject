@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For formatting the date
 
-class ExpenseTrackerHome extends StatefulWidget {
-  const ExpenseTrackerHome({super.key});
+class new_expense extends StatefulWidget {
+  const new_expense({super.key});
 
   @override
-  State<ExpenseTrackerHome> createState() => _ExpenseTrackerHomeState();
+  State<new_expense> createState() => _ExpenseTrackerHomeState();
 }
 
-class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
+class _ExpenseTrackerHomeState extends State<new_expense> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _nameController = TextEditingController();
@@ -76,7 +76,7 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
                 decoration: InputDecoration(labelText: "Name"),
                 keyboardType: TextInputType.text,
                 validator: (value) =>
-                value!.isEmpty ? "Enter an expense name" : null,
+                    value!.isEmpty ? "Enter an expense name" : null,
               ),
               DropdownButtonFormField<String>(
                 value: selectedCategory,
@@ -93,7 +93,7 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
                   });
                 },
                 validator: (value) =>
-                value == null ? "Select a category" : null,
+                    value == null ? "Select a category" : null,
               ),
               TextFormField(
                 controller: _amountController,
@@ -117,7 +117,7 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
                       : DateFormat.yMMMd().format(selectedDate!),
                 ),
                 validator: (value) =>
-                selectedDate == null ? "Select a date" : null,
+                    selectedDate == null ? "Select a date" : null,
               ),
               SizedBox(height: 20),
               ElevatedButton(
@@ -147,20 +147,20 @@ class _ExpenseTrackerHomeState extends State<ExpenseTrackerHome> {
       body: expenseList.isEmpty
           ? Center(child: Text("No expenses added yet!"))
           : ListView.builder(
-        itemCount: expenseList.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              title: Text(expenseList[index].name),
-              subtitle: Text(
-                "${expenseList[index].category} - \$${expenseList[index].price.toStringAsFixed(2)}\n"
-                    "Date: ${DateFormat.yMMMd().format(expenseList[index].date)}",
-              ),
-              trailing: Icon(Icons.arrow_forward),
+              itemCount: expenseList.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: ListTile(
+                    title: Text(expenseList[index].name),
+                    subtitle: Text(
+                      "${expenseList[index].category} - \$${expenseList[index].price.toStringAsFixed(2)}\n"
+                      "Date: ${DateFormat.yMMMd().format(expenseList[index].date)}",
+                    ),
+                    trailing: Icon(Icons.arrow_forward),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }

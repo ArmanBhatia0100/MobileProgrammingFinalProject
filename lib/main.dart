@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerForm.dart';
+import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerHome.dart';
+import 'package:mobile_programming_final_project/view/eventPlanner/eventdatabase.dart';
 import 'package:mobile_programming_final_project/view/expenseTracker/ExpenseTrackerHome.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final eventdatabase = await $FloorEventDatabase.databaseBuilder('event.db').build();
+  runApp(MyApp(eventdatabase));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final EventDatabase eventdatabase;
+  MyApp(this.eventdatabase);
 
   // This widget is the root of your application.
   @override
@@ -19,17 +25,21 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routes:{
-        "/":(context)=>const MyHomePage(title: 'Team One Final project'),
-  "/expense":(context)=>const Expensetrackerhome(),
+        "/":(context)=>MyHomePage(title: 'Team One Final project'),
+        "/eventplanner":(context) => EventPlannerHome(eventdatabase: eventdatabase),
+        "/expense":(context) => Expensetrackerhome(),
+        "/eventplannerform":(context) => EventPlannerForm(eventdatabase: eventdatabase,)
       } ,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class ExpenseTrackerHome {
+}
 
+class MyHomePage extends StatefulWidget {
   final String title;
+  const MyHomePage({super.key, required this.title});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -46,7 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(child:
         Column(mainAxisAlignment:MainAxisAlignment.spaceEvenly,children: [
-        OutlinedButton(onPressed: (){}, child: Text("Page 1")),
+        OutlinedButton(onPressed: (){
+          Navigator.pushNamed(context, "/eventplanner");
+        }, child: Text("Event Planner")),
         OutlinedButton(onPressed: (){}, child: Text("Page 2")),
         OutlinedButton(onPressed: (){
           Navigator.pushNamed(context, "/expense");

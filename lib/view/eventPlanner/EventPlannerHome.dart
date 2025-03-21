@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-
+import 'EventPlannerForm.dart';
 import 'event.dart';
 import 'event_dao.dart';
 import 'eventdatabase.dart';
 
 class EventPlannerHome extends StatefulWidget {
   final EventDatabase eventdatabase;
-   EventPlannerHome({super.key, required this.eventdatabase});
+  EventPlannerHome({super.key, required this.eventdatabase});
 
   @override
   State<EventPlannerHome> createState() => _EventPlannerHomeState();
@@ -16,11 +16,10 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
   late EventDao eventDao;
   List<Event> events = [];
 
-
   @override
   void initState() {
     super.initState();
-    eventDao= widget.eventdatabase.eventDao;
+    eventDao = widget.eventdatabase.eventDao;
     _loadEvents();
   }
 
@@ -31,9 +30,20 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
     });
   }
 
-  Future<void> _deleteEvent(int id) async {
-    await eventDao.deleteEvent(id);
-    _loadEvents();
+  Future<void> _deleteEvent(int? id) async {
+    if (id != null) {
+      await eventDao.deleteEventById(id);
+      _loadEvents();
+    }
+  }
+
+  void _editEvent(Event event) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EventPlannerForm(eventdatabase: widget.eventdatabase, event: event),
+      ),
+    ).then((_) => _loadEvents());
   }
 
   @override
@@ -53,7 +63,8 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
           )
         ],
       ),
-      body: ListPage());
+      body: ListPage(),
+    );
   }
 
   Widget ListPage() {
@@ -62,73 +73,67 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Expanded(
-              child: events.isEmpty
-                  ? Text("There are no items in the list")
-                  : ListView.builder(
-                  itemCount: events.length,
-                  itemBuilder: (context, rowNum) {
-                    final event = events[rowNum];
-                    return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          GestureDetector(
-                            child: Text("Item ${1 + rowNum}:"),
-                            onLongPress: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    AlertDialog(
-                                      title: const Text(
-                                          'Would you like to remove this item?'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          onPressed: () {
-                                            _deleteEvent(event.id);
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Yes'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('No'),
-                                        ),
-                                      ],
-                                    ),
-                              );
-                            },
-                          ),
-                          GestureDetector(
-                            child: Text(events[rowNum].title),
-                            onLongPress: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    AlertDialog(
-                                      title: const Text(
-                                          'Would you like to remove this item?'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          onPressed: () {
-                                            _deleteEvent(event.id);
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Yes'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('No'),
-                                        ),
-                                      ],
-                                    ),
-                              );
-                            },
-                          )
-                        ]);
-                  }))
+            child: events.isEmpty
+                ? Text("There are no items in the list")
+                : ListView.builder(
+              itemCount: events.length,
+              itemBuilder: (context, rowNum) {
+                final event = events[rowNum];
+                return Card(
+                  margin: EdgeInsets.all(10),
+                  child: ListTile(
+                    title: Text(event.title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          event.description,
+                          maxLines: null,
+                          overflow: TextOverflow.visible,
+                        ),
+                        Text("Number of attendees: ${event.number_of_attendees}"),
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () => _editEvent(event),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: const Text('Would you like to remove this item?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      _deleteEvent(event.id);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Yes'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('No'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

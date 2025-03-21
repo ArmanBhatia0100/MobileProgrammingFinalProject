@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         "/":(context)=>MyHomePage(title: 'Team One Final project'),
         "/eventplanner":(context) => EventPlannerHome(eventdatabase: eventdatabase),
         "/expense":(context) => Expensetrackerhome(),
-        "/eventplannerform":(context) => EventPlannerForm(eventdatabase: eventdatabase,)
+        "/eventplannerform":(context) => EventPlannerForm(eventdatabase: eventdatabase,),
       } ,
     );
   }

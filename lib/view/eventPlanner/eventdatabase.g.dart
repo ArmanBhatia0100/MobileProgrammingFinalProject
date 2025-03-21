@@ -96,7 +96,7 @@ class _$EventDatabase extends EventDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Event` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `number_of_attendees` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Event` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `number_of_attendees` TEXT NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -123,6 +123,26 @@ class _$EventDao extends EventDao {
                   'title': item.title,
                   'description': item.description,
                   'number_of_attendees': item.number_of_attendees
+                }),
+        _eventUpdateAdapter = UpdateAdapter(
+            database,
+            'Event',
+            ['id'],
+            (Event item) => <String, Object?>{
+                  'id': item.id,
+                  'title': item.title,
+                  'description': item.description,
+                  'number_of_attendees': item.number_of_attendees
+                }),
+        _eventDeletionAdapter = DeletionAdapter(
+            database,
+            'Event',
+            ['id'],
+            (Event item) => <String, Object?>{
+                  'id': item.id,
+                  'title': item.title,
+                  'description': item.description,
+                  'number_of_attendees': item.number_of_attendees
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -133,18 +153,29 @@ class _$EventDao extends EventDao {
 
   final InsertionAdapter<Event> _eventInsertionAdapter;
 
+  final UpdateAdapter<Event> _eventUpdateAdapter;
+
+  final DeletionAdapter<Event> _eventDeletionAdapter;
+
   @override
-  Future<List<Event>> getAllEvents() async {
-    return _queryAdapter.queryList('SELECT * FROM Event',
-        mapper: (Map<String, Object?> row) => Event(
-            row['id'] as int,
-            row['title'] as String,
-            row['description'] as String,
-            row['number_of_attendees'] as String));
+  Future<Event?> findEventById(int id) async {
+    return _queryAdapter.query('SELECT * FROM Event WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => Event(row['title'] as String,
+            row['description'] as String, row['number_of_attendees'] as String,
+            id: row['id'] as int?),
+        arguments: [id]);
   }
 
   @override
-  Future<void> deleteEvent(int id) async {
+  Future<List<Event>> getAllEvents() async {
+    return _queryAdapter.queryList('SELECT * FROM Event',
+        mapper: (Map<String, Object?> row) => Event(row['title'] as String,
+            row['description'] as String, row['number_of_attendees'] as String,
+            id: row['id'] as int?));
+  }
+
+  @override
+  Future<void> deleteEventById(int id) async {
     await _queryAdapter
         .queryNoReturn('DELETE FROM Event WHERE id = ?1', arguments: [id]);
   }
@@ -152,5 +183,15 @@ class _$EventDao extends EventDao {
   @override
   Future<void> insertEvent(Event event) async {
     await _eventInsertionAdapter.insert(event, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateEvent(Event event) async {
+    await _eventUpdateAdapter.update(event, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteEvent(Event event) async {
+    await _eventDeletionAdapter.delete(event);
   }
 }

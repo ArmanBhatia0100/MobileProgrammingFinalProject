@@ -15,7 +15,7 @@ class ExpensePage extends StatefulWidget {
 class _ExpensePageState extends State<ExpensePage> {
   late Future<List<Expense>> _expenses;
   Expense? _selectedExpense;
-  int _selectedIndex = 1; // Default to "Expenses" (index 1)
+  int _selectedIndex = 1;
 
   @override
   void initState() {
@@ -46,14 +46,42 @@ class _ExpensePageState extends State<ExpensePage> {
     );
   }
 
+  void _clearAllExpenses() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear All Expenses'),
+        content: const Text('Are you sure you want to delete all expenses? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              await DatabaseHelper.instance.deleteAllExpenses();
+              _loadExpenses(); // Refresh the list
+              if (!context.mounted) return;
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('All expenses deleted')),
+              );
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _onNavTap(int index) {
     setState(() {
       _selectedIndex = index;
     });
     if (index == 0) {
-      Navigator.pushNamed(context, '/'); // Home
+      Navigator.pushNamed(context, '/');
     } else if (index == 1) {
-      Navigator.pushNamed(context, '/expense'); // Expenses
+      Navigator.pushNamed(context, '/expense');
     }
   }
 
@@ -99,6 +127,11 @@ class _ExpensePageState extends State<ExpensePage> {
               _loadExpenses();
             },
             tooltip: 'Add Expense',
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_forever),
+            onPressed: _clearAllExpenses,
+            tooltip: 'Clear All Expenses',
           ),
         ],
       ),

@@ -1,3 +1,4 @@
+// lib/database/db_helper.dart
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/expense.dart';
@@ -53,6 +54,16 @@ class DatabaseHelper {
     final db = await instance.database;
     final result = await db.query('expenses', orderBy: 'date DESC');
     return result.map((json) => Expense.fromMap(json)).toList();
+  }
+
+  Future<int> updateExpense(Expense expense) async {
+    final db = await instance.database;
+    return await db.update(
+      'expenses',
+      expense.toMap(),
+      where: 'id = ?',
+      whereArgs: [expense.id],
+    );
   }
 
   Future<int> deleteExpense(int id) async {

@@ -18,6 +18,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        textTheme: const TextTheme(
+          headlineMedium: TextStyle(fontSize: 24.0),
+          bodyLarge: TextStyle(fontSize: 16.0),
+        ),
       ),
       initialRoute: '/',
       routes: {

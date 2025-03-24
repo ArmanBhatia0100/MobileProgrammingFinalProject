@@ -1,7 +1,9 @@
+// lib/pages/expense_page.dart
 import 'package:flutter/material.dart';
 import '../widgets/expense_list.dart';
 import '../database/db_helper.dart';
 import '../models/expense.dart';
+import '../widgets/expense_detail.dart';
 
 class ExpensePage extends StatefulWidget {
   const ExpensePage({super.key});
@@ -12,6 +14,8 @@ class ExpensePage extends StatefulWidget {
 
 class _ExpensePageState extends State<ExpensePage> {
   late Future<List<Expense>> _expenses;
+  Expense? _selectedExpense;
+  int _selectedIndex = 1; // Default to "Expenses" (index 1)
 
   @override
   void initState() {
@@ -22,6 +26,7 @@ class _ExpensePageState extends State<ExpensePage> {
   void _loadExpenses() {
     setState(() {
       _expenses = DatabaseHelper.instance.getExpenses();
+      _selectedExpense = null;
     });
   }
 
@@ -41,15 +46,51 @@ class _ExpensePageState extends State<ExpensePage> {
     );
   }
 
+  void _onNavTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if (index == 0) {
+      Navigator.pushNamed(context, '/'); // Home
+    } else if (index == 1) {
+      Navigator.pushNamed(context, '/expense'); // Expenses
+    }
+  }
+
+  void _onExpenseSelected(Expense expense) {
+    setState(() {
+      _selectedExpense = expense;
+    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ExpenseDetail(
+          expense: expense,
+          onExpenseUpdated: _loadExpenses,
+        ),
+      ),
+    ).then((_) {
+      setState(() {
+        _selectedExpense = null;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isLargeScreen = screenWidth >= 600;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Expenses'),
+        centerTitle: true,
+        elevation: 2,
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
             onPressed: _showInstructions,
+            tooltip: 'Instructions',
           ),
           IconButton(
             icon: const Icon(Icons.add),
@@ -57,27 +98,60 @@ class _ExpensePageState extends State<ExpensePage> {
               await Navigator.pushNamed(context, '/add-expense');
               _loadExpenses();
             },
+            tooltip: 'Add Expense',
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(child: ExpenseList(expenses: _expenses)),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Your Expenses',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16.0),
+            Expanded(
+              child: isLargeScreen
+                  ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: ExpenseList(
+                      expenses: _expenses,
+                      onExpenseSelected: _onExpenseSelected,
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: _selectedExpense != null
+                        ? ExpenseDetail(
+                      expense: _selectedExpense!,
+                      onExpenseUpdated: _loadExpenses,
+                    )
+                        : const Center(child: Text('Select an expense to edit')),
+                  ),
+                ],
+              )
+                  : ExpenseList(
+                expenses: _expenses,
+                onExpenseSelected: _onExpenseSelected,
+              ),
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Expenses'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, '/');
-          } else if (index == 1) {
-            Navigator.pushNamed(context, '/expense');
-          }
-        },
+        onTap: _onNavTap,
       ),
     );
   }

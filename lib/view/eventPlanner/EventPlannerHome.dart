@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/eventPlanner_localizations.dart';
 import 'EventPlannerForm.dart';
 import 'event.dart';
 import 'event_dao.dart';
@@ -6,7 +7,13 @@ import 'eventdatabase.dart';
 
 class EventPlannerHome extends StatefulWidget {
   final EventDatabase eventdatabase;
-  EventPlannerHome({super.key, required this.eventdatabase});
+  final void Function(Locale) onLocaleChange;
+
+  const EventPlannerHome({
+    super.key,
+    required this.eventdatabase,
+    required this.onLocaleChange,
+  });
 
   @override
   State<EventPlannerHome> createState() => _EventPlannerHomeState();
@@ -15,6 +22,7 @@ class EventPlannerHome extends StatefulWidget {
 class _EventPlannerHomeState extends State<EventPlannerHome> {
   late EventDao eventDao;
   List<Event> events = [];
+  Event? selectedEvent;
 
   @override
   void initState() {
@@ -35,99 +43,141 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
       await eventDao.deleteEventById(id);
       _loadEvents();
     }
+    selectedEvent = null;
   }
 
   void _editEvent(Event event) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EventPlannerForm(eventdatabase: widget.eventdatabase, event: event),
+        builder: (context) => EventPlannerForm(
+          eventdatabase: widget.eventdatabase,
+          event: event,
+        ),
       ),
     ).then((_) => _loadEvents());
   }
 
+  void _changeLanguage(Locale locale) {
+    widget.onLocaleChange(locale);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: Text("Event Planner"),
+        title: Text(localizations.eventPlanner),
         actions: [
+          IconButton(
+            icon: Icon(Icons.info),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text(localizations.instructionsTitle),
+                    content: Text(localizations.instructions),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+          PopupMenuButton<Locale>(
+            onSelected: _changeLanguage,
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<Locale>>[
+              const PopupMenuItem<Locale>(
+                value: Locale('en'),
+                child: Text('English'),
+              ),
+              const PopupMenuItem<Locale>(
+                value: Locale('fr'),
+                child: Text('Français'),
+              ),
+            ],
+            icon: Icon(Icons.language),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, "/eventplannerform");
-                },
-                child: Text("Add Event")),
-          )
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EventPlannerForm(
+                      eventdatabase: widget.eventdatabase,
+                    ),
+                  ),
+                );
+                if (result != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(result.toString())),
+                  );
+                  _loadEvents();
+                }
+              },
+              child: Text(localizations.addEvent),
+            ),
+          ),
         ],
       ),
-      body: ListPage(),
+      body: reactiveLayout(),
     );
   }
 
+  Widget reactiveLayout() {
+    var size = MediaQuery.of(context).size;
+    var height = size.height;
+    var width = size.width;
+
+    if ((width > height) && (width > 720)) {
+      return Row(children: [
+        Expanded(flex: 1, child: ListPage()),
+        Expanded(flex: 2, child: DetailsPage()),
+      ]);
+    } else {
+      return selectedEvent == null ? ListPage() : DetailsPage();
+    }
+  }
+
   Widget ListPage() {
+    final localizations = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Expanded(
             child: events.isEmpty
-                ? Text("There are no items in the list")
+                ? Text(localizations.noEvents)
                 : ListView.builder(
               itemCount: events.length,
               itemBuilder: (context, rowNum) {
                 final event = events[rowNum];
-                return Card(
-                  margin: EdgeInsets.all(10),
-                  child: ListTile(
-                    title: Text(event.title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          event.description,
-                          maxLines: null,
-                          overflow: TextOverflow.visible,
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedEvent = event;
+                    });
+                  },
+                  child: Card(
+                    margin: EdgeInsets.all(10),
+                    child: ListTile(
+                      title: Text(
+                        event.eventName,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Text("Number of attendees: ${event.number_of_attendees}"),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => _editEvent(event),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) => AlertDialog(
-                                title: const Text('Would you like to remove this item?'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      _deleteEvent(event.id);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Yes'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('No'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 );
@@ -137,5 +187,78 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
         ],
       ),
     );
+  }
+
+  Widget DetailsPage() {
+    final localizations = AppLocalizations.of(context)!;
+
+    if (selectedEvent == null) {
+      return Center(
+        child: Text(localizations.selectEvent),
+      );
+    } else {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "${localizations.selectedEvent} ${selectedEvent!.eventName}",
+              style: TextStyle(fontSize: 30),
+            ),
+            Text(
+              "${localizations.description} ${selectedEvent!.description}",
+              style: TextStyle(fontSize: 20),
+            ),
+            Text("Date: ${selectedEvent!.date}", style: TextStyle(fontSize: 20)),
+            Text("Time: ${selectedEvent!.time}", style: TextStyle(fontSize: 20)),
+            Text("Location: ${selectedEvent!.location}",
+                style: TextStyle(fontSize: 20)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () => _editEvent(selectedEvent!),
+                  child: Text(localizations.editEvent),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: Text(localizations.removeEvent),
+                        content: Text(localizations.removeEvent),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              _deleteEvent(selectedEvent!.id);
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(localizations.yes),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text(localizations.no),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  child: Text(localizations.removeEvent)
+                ),
+              ],
+            ),
+            TextButton(
+              child: Text(localizations.close),
+              onPressed: () {
+                setState(() {
+                  selectedEvent = null;
+                });
+              },
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

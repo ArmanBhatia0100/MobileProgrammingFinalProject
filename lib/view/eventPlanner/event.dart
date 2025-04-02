@@ -2,11 +2,20 @@ import 'package:floor/floor.dart';
 
 @entity
 class Event {
-  @PrimaryKey(autoGenerate: true)
-  final int? id;
-  final String title;
-  final String description;
-  final String number_of_attendees;
+  static int ID = 1;
 
-  Event(this.title, this.description, this.number_of_attendees, {this.id});
+  @PrimaryKey()
+  final int id;
+  final String eventName;
+  final String date;
+  final String time;
+  final String location;
+  final String description;
+
+  Event(this.id, this.eventName, this.date, this.time, this.location, this.description)
+  {
+    if(this.id == ID) {
+      ID = (this.id+1);
+    }
+  }
 }

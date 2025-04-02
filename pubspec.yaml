@@ -39,6 +39,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  shared_preferences: ^2.5.3
+  encrypted_shared_preferences: ^3.0.1
 
 dev_dependencies:
   flutter_test:

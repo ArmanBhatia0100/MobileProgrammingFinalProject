@@ -2,7 +2,7 @@
   "@@locale": "en",
   "eventPlanner": "Event Planner",
   "instructionsTitle": "Instructions",
-  "instructions": "To use the Event Planner:\n\n 1. Click 'Add Event' to create a new event.\n2. Fill in the event details and save.\n3. Click on an event to view details.\n4. Use the edit and delete buttons to modify or remove events.",
+  "instructions": "To use the Event Planner:\n\n1. Click 'Add Event' to create a new event.\n2. Fill in the event details and save.\n3. Click on an event to view details.\n4. Use the edit and delete buttons to modify or remove events.",
   "addEvent": "Add Event",
   "selectEvent": "Select an event to see details",
   "selectedEvent": "Selected Event:",
@@ -21,11 +21,11 @@
   "eventDescription": "Event Description",
   "add": "Add",
   "save": "Save",
-  "date": "Date",
+  "date": "Date:",
   "enterDate": "Please select a date",
-  "time": "Time",
+  "time": "Time:",
   "enterTime": "Please select a time",
-  "location": "Location",
+  "location": "Location:",
   "enterLocation": "Please enter a location",
   "areYouSureYouWantToDelete": "Are you sure you want to delete this event?"
 }

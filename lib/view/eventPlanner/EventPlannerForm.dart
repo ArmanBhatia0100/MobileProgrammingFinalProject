@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/eventPlanner_localizations.dart';
+import 'EventPlannerHome.dart';
 import 'event.dart';
 import 'event_dao.dart';
 import 'eventdatabase.dart';
+import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 
 class EventPlannerForm extends StatefulWidget {
   final EventDatabase eventdatabase;
@@ -25,6 +26,7 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
   final TextEditingController eventTimeController = TextEditingController();
   final TextEditingController eventLocationController = TextEditingController();
 
+  EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
   @override
   void initState() {
     super.initState();
@@ -36,13 +38,61 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
       eventDateController.text = widget.event!.date;
       eventTimeController.text = widget.event!.time;
       eventLocationController.text = widget.event!.location;
+    }else{
+      loadPrefs();
     }
+  }
+
+  Future<void> loadPrefs() async {
+    String? eventName = await prefs.getString("eventName");
+    String? eventDescription = await prefs.getString("eventDescription");
+    String? eventLocation = await prefs.getString("eventLocation");
+    String? eventDate = await prefs.getString("eventDate");
+    String? eventTime = await prefs.getString("eventTime");
+
+    setState(() {
+      eventNameController.text = eventName ?? '';
+      eventDescriptionController.text = eventDescription ?? '';
+      eventLocationController.text = eventLocation ?? '';
+      eventDateController.text = eventDate ?? '';
+      eventTimeController.text = eventTime ?? '';
+    });
+  }
+
+  Future<void> savePrefs() async {{
+    await prefs.setString("eventName", eventNameController.text);
+    await prefs.setString("eventDescription", eventDescriptionController.text);
+    await prefs.setString("eventLocation", eventLocationController.text);
+    await prefs.setString("eventDate", eventDateController.text);
+    await prefs.setString("eventTime", eventTimeController.text);
+  }}
+
+  @override
+  void dispose() {
+    savePrefs();
+    eventNameController.dispose();
+    eventDescriptionController.dispose();
+    eventDateController.dispose();
+    eventTimeController.dispose();
+    eventLocationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> cleanPrefs() async {
+    await prefs.clear();
+    setState(() {
+      eventNameController.clear();
+      eventDescriptionController.clear();
+      eventLocationController.clear();
+      eventDateController.clear();
+      eventTimeController.clear();
+    });
   }
 
   Future<void> _saveEvent() async {
     if (_formKey.currentState!.validate()) {
       final newEvent = Event(
-        widget.event?.id ?? Event.ID++, // Manual ID or keep for update
+        widget.event?.id ?? Event.ID++,
         eventNameController.text,
         eventDateController.text,
         eventTimeController.text,
@@ -56,11 +106,16 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
         await eventDao.updateEvent(newEvent);
       }
 
-      Navigator.pop(
+      await cleanPrefs();
+
+      Navigator.pushReplacement(
         context,
-        widget.event == null
-            ? AppLocalizations.of(context)!.eventAddedSuccessfully
-            : AppLocalizations.of(context)!.eventUpdatedSuccessfully,
+        MaterialPageRoute(
+          builder: (context) => EventPlannerHome(
+            eventdatabase: widget.eventdatabase,
+            onLocaleChange: (Locale locale) {},
+          ),
+        ),
       );
     }
   }

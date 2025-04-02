@@ -178,6 +178,8 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      subtitle: Text(event.description),
+                      trailing: Icon(Icons.arrow_forward),
                     ),
                   ),
                 );
@@ -198,65 +200,76 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
       );
     } else {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "${localizations.selectedEvent} ${selectedEvent!.eventName}",
-              style: TextStyle(fontSize: 30),
-            ),
-            Text(
-              "${localizations.description} ${selectedEvent!.description}",
-              style: TextStyle(fontSize: 20),
-            ),
-            Text("Date: ${selectedEvent!.date}", style: TextStyle(fontSize: 20)),
-            Text("Time: ${selectedEvent!.time}", style: TextStyle(fontSize: 20)),
-            Text("Location: ${selectedEvent!.location}",
-                style: TextStyle(fontSize: 20)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _editEvent(selectedEvent!),
-                  child: Text(localizations.editEvent),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        title: Text(localizations.removeEvent),
-                        content: Text(localizations.removeEvent),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              _deleteEvent(selectedEvent!.id);
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(localizations.yes),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: Text(localizations.no),
-                          ),
-                        ],
+        child: SingleChildScrollView(
+          child: Card(
+            margin: EdgeInsets.all(10),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${selectedEvent!.eventName}",
+                    style: TextStyle(fontSize: 30),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "${localizations.description} ${selectedEvent!.description}",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(height: 10),
+                  Text("${localizations.date} ${selectedEvent!.date}", style: TextStyle(fontSize: 20)),
+                  Text("${localizations.time} ${selectedEvent!.time}", style: TextStyle(fontSize: 20)),
+                  Text("${localizations.location} ${selectedEvent!.location}", style: TextStyle(fontSize: 20)),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _editEvent(selectedEvent!),
+                        child: Text(localizations.editEvent),
                       ),
-                    );
-                  },
-                  child: Text(localizations.removeEvent)
-                ),
-              ],
+                      SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: Text(localizations.removeEvent),
+                              content: Text(localizations.areYouSureYouWantToDelete),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    _deleteEvent(selectedEvent!.id);
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(localizations.yes),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: Text(localizations.no),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        child: Text(localizations.removeEvent),
+                      ),
+                    ],
+                  ),
+                  TextButton(
+                    child: Text(localizations.close),
+                    onPressed: () {
+                      setState(() {
+                        selectedEvent = null;
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
-            TextButton(
-              child: Text(localizations.close),
-              onPressed: () {
-                setState(() {
-                  selectedEvent = null;
-                });
-              },
-            ),
-          ],
+          ),
         ),
       );
     }

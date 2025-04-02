@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_programming_final_project/view/ListPage/CustomerListHome.dart';
 import 'package:mobile_programming_final_project/view/expenseTracker/ExpenseTrackerHome.dart';
 
 void main() {
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
       routes:{
         "/":(context)=>const MyHomePage(title: 'Team One Final project'),
   "/expense":(context)=>const Expensetrackerhome(),
+        "/customer":(context)=>const CustomerListHome(),
       } ,
     );
   }
@@ -47,7 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(child:
         Column(mainAxisAlignment:MainAxisAlignment.spaceEvenly,children: [
         OutlinedButton(onPressed: (){}, child: Text("Page 1")),
-        OutlinedButton(onPressed: (){}, child: Text("Page 2")),
+        OutlinedButton(onPressed: (){
+          Navigator.pushNamed(context, "/customer");
+        }, child: Text("Customer List")),
         OutlinedButton(onPressed: (){
           Navigator.pushNamed(context, "/expense");
         }, child: Text("Expense Tracker")),

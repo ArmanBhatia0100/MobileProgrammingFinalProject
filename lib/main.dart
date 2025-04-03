@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mobile_programming_final_project/view/ListPage/AppLocalizations.dart';
 import 'package:mobile_programming_final_project/view/ListPage/CustomerListHome.dart';
-import 'package:mobile_programming_final_project/view/expenseTracker/ExpenseTrackerHome.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/eventPlanner_localizations.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerForm.dart';
+import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerHome.dart';
+import 'package:mobile_programming_final_project/view/eventPlanner/eventdatabase.dart';
+import 'package:mobile_programming_final_project/view/expenseTracker/ExpenseTrackerHome.dart';
+import 'pages/home_page.dart';
+import 'pages/expense_page.dart';
+import 'pages/add_expense.dart';
+
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final eventdatabase = await $FloorEventDatabase.databaseBuilder('event.db').build();
+  runApp(MyApp(eventdatabase: eventdatabase));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final EventDatabase eventdatabase;
+
+  const MyApp({super.key, required this.eventdatabase});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
+
 
 class _MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en'); // Default language
@@ -24,11 +38,11 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Event Planner App',
+
+      title: 'Group project',
       debugShowCheckedModeBanner: false,
       locale: _locale,
       supportedLocales: const [
@@ -44,49 +58,80 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        textTheme: const TextTheme(
+          headlineMedium: TextStyle(fontSize: 24.0),
+          bodyLarge: TextStyle(fontSize: 16.0),
+        ),
       ),
       initialRoute: '/',
-      routes:{
-        "/":(context)=>const MyHomePage(title: 'Team One Final project'),
-        "/expense":(context)=>const Expensetrackerhome(),
+
+//       routes:{
+//         "/":(context)=>const MyHomePage(title: 'Team One Final project'),
+//         "/expense":(context)=>const Expensetrackerhome(),
+//         "/customer":(context)=> CustomerListHome(
+//           onLocaleChange: _changeLocale,
+//         ),
+//       } ,
+
+      routes: {
+        '/': (context) => MyHomePage(title: 'Team One Final Project'),
+        '/eventplanner': (context) => EventPlannerHome(
+          eventdatabase: widget.eventdatabase,
+          onLocaleChange: _changeLocale,
+        ),
+        '/expense': (context) => const ExpensePage(),
+        '/add-expense': (context) => AddExpensePage(),
+        '/eventplannerform': (context) => EventPlannerForm(
+          eventdatabase: widget.eventdatabase,
+        ),
         "/customer":(context)=> CustomerListHome(
           onLocaleChange: _changeLocale,
         ),
-      } ,
+      },
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
   final String title;
+
+  const MyHomePage({super.key, required this.title});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Center(child:
-      Column(mainAxisAlignment:MainAxisAlignment.spaceEvenly,children: [
-        OutlinedButton(onPressed: (){}, child: Text("Page 1")),
-        OutlinedButton(onPressed: (){
-          Navigator.pushNamed(context, "/customer");
-        }, child: Text("Customer List")),
-        OutlinedButton(onPressed: (){
-          Navigator.pushNamed(context, "/expense");
-        }, child: Text("Expense Tracker")),
-        OutlinedButton(onPressed: (){}, child: Text("Page 4"))
-      ],),),
-      // This trailing comma makes auto-formatting nicer for build methods.
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            OutlinedButton(
+              onPressed: () => Navigator.pushNamed(context, "/eventplanner"),
+              child: const Text("Event Planner"),
+            ),
+            OutlinedButton(
+              onPressed: () => Navigator.pushNamed(context, "/customer"),
+              child: const Text("Customer List"),
+            ),
+            OutlinedButton(
+              onPressed: () => Navigator.pushNamed(context, "/expense"),
+              child: const Text("Expense Tracker"),
+            ),
+            OutlinedButton(
+              onPressed: () {},
+              child: const Text("Page 3"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

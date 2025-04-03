@@ -5,6 +5,7 @@ import 'event.dart';
 import 'event_dao.dart';
 import 'eventdatabase.dart';
 
+/// This is the home page for the event planner app
 class EventPlannerHome extends StatefulWidget {
   final EventDatabase eventdatabase;
   final void Function(Locale) onLocaleChange;
@@ -19,11 +20,13 @@ class EventPlannerHome extends StatefulWidget {
   State<EventPlannerHome> createState() => _EventPlannerHomeState();
 }
 
+/// This is the state for the home page
 class _EventPlannerHomeState extends State<EventPlannerHome> {
   late EventDao eventDao;
   List<Event> events = [];
   Event? selectedEvent;
 
+  /// This is the initState method
   @override
   void initState() {
     super.initState();
@@ -31,6 +34,7 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
     _loadEvents();
   }
 
+  /// This method loads the events from the database
   Future<void> _loadEvents() async {
     final allEvents = await eventDao.getAllEvents();
     setState(() {
@@ -38,6 +42,7 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
     });
   }
 
+  /// This method deletes an event from the databases
   Future<void> _deleteEvent(int? id) async {
     if (id != null) {
       await eventDao.deleteEventById(id);
@@ -46,6 +51,7 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
     selectedEvent = null;
   }
 
+  /// This method edits an event
   void _editEvent(Event event) {
     Navigator.push(
       context,
@@ -58,10 +64,12 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
     ).then((_) => _loadEvents());
   }
 
+  /// This method changes the language of the app
   void _changeLanguage(Locale locale) {
     widget.onLocaleChange(locale);
   }
 
+  /// This method builds the app bar
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -133,6 +141,7 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
     );
   }
 
+  /// This method builds the layout of the app
   Widget reactiveLayout() {
     var size = MediaQuery.of(context).size;
     var height = size.height;
@@ -148,6 +157,7 @@ class _EventPlannerHomeState extends State<EventPlannerHome> {
     }
   }
 
+  /// This method builds the list of events
   Widget ListPage() {
     final localizations = AppLocalizations.of(context)!;
 

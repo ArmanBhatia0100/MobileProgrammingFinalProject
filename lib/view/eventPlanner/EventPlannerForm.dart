@@ -6,6 +6,7 @@ import 'event_dao.dart';
 import 'eventdatabase.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 
+/// This is the form for adding and editing eventss
 class EventPlannerForm extends StatefulWidget {
   final EventDatabase eventdatabase;
   final Event? event;
@@ -16,6 +17,7 @@ class EventPlannerForm extends StatefulWidget {
   State<EventPlannerForm> createState() => _EventPlannerFormState();
 }
 
+/// This is the state for the form
 class _EventPlannerFormState extends State<EventPlannerForm> {
   late EventDao eventDao;
   final _formKey = GlobalKey<FormState>();
@@ -27,6 +29,8 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
   final TextEditingController eventLocationController = TextEditingController();
 
   EncryptedSharedPreferences prefs = EncryptedSharedPreferences();
+
+  /// This is the initState method
   @override
   void initState() {
     super.initState();
@@ -43,6 +47,7 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
     }
   }
 
+  /// This method loads the preferences from the encrypted shared preferences
   Future<void> loadPrefs() async {
     String? eventName = await prefs.getString("eventName");
     String? eventDescription = await prefs.getString("eventDescription");
@@ -59,6 +64,7 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
     });
   }
 
+  /// This method saves the preferences to the encrypted shared preferences
   Future<void> savePrefs() async {{
     await prefs.setString("eventName", eventNameController.text);
     await prefs.setString("eventDescription", eventDescriptionController.text);
@@ -67,6 +73,7 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
     await prefs.setString("eventTime", eventTimeController.text);
   }}
 
+  /// This method clears the preferences from the encrypted shared preferences
   @override
   void dispose() {
     savePrefs();
@@ -78,6 +85,7 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
     super.dispose();
   }
 
+  /// This method clears the preferences from the encrypted shared preferences
   Future<void> cleanPrefs() async {
     await prefs.clear();
     setState(() {
@@ -89,6 +97,7 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
     });
   }
 
+  /// This method saves the event to the database
   Future<void> _saveEvent() async {
     if (_formKey.currentState!.validate()) {
       final newEvent = Event(
@@ -120,6 +129,7 @@ class _EventPlannerFormState extends State<EventPlannerForm> {
     }
   }
 
+  /// This method shows a dialog to confirm the deletion of the event
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;

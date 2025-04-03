@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:mobile_programming_final_project/view/ListPage/AppLocalizations.dart';
+import 'package:mobile_programming_final_project/view/ListPage/CustomerListHome.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/eventPlanner_localizations.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+
 class _MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en'); // Default language
 
@@ -41,8 +43,6 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
 
       title: 'Group project',
- 
-
       debugShowCheckedModeBanner: false,
       locale: _locale,
       supportedLocales: const [
@@ -64,6 +64,15 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
       initialRoute: '/',
+
+//       routes:{
+//         "/":(context)=>const MyHomePage(title: 'Team One Final project'),
+//         "/expense":(context)=>const Expensetrackerhome(),
+//         "/customer":(context)=> CustomerListHome(
+//           onLocaleChange: _changeLocale,
+//         ),
+//       } ,
+
       routes: {
         '/': (context) => MyHomePage(title: 'Team One Final Project'),
         '/eventplanner': (context) => EventPlannerHome(
@@ -74,6 +83,9 @@ class _MyAppState extends State<MyApp> {
         '/add-expense': (context) => AddExpensePage(),
         '/eventplannerform': (context) => EventPlannerForm(
           eventdatabase: widget.eventdatabase,
+        ),
+        "/customer":(context)=> CustomerListHome(
+          onLocaleChange: _changeLocale,
         ),
       },
     );
@@ -106,8 +118,8 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text("Event Planner"),
             ),
             OutlinedButton(
-              onPressed: () {},
-              child: const Text("Page 2"),
+              onPressed: () => Navigator.pushNamed(context, "/customer"),
+              child: const Text("Customer List"),
             ),
             OutlinedButton(
               onPressed: () => Navigator.pushNamed(context, "/expense"),

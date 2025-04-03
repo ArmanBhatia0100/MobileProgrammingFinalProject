@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_programming_final_project/view/ListPage/AppLocalizations.dart';
+// import 'package:mobile_programming_final_project/view/ListPage/AppLocalizations.dart';
 import 'package:mobile_programming_final_project/view/ListPage/CustomerListHome.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/eventPlanner_localizations.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerForm.dart';
 import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerHome.dart';
 import 'package:mobile_programming_final_project/view/eventPlanner/eventdatabase.dart';
-import 'package:mobile_programming_final_project/view/expenseTracker/ExpenseTrackerHome.dart';
 import 'pages/home_page.dart';
 import 'pages/expense_page.dart';
 import 'pages/add_expense.dart';

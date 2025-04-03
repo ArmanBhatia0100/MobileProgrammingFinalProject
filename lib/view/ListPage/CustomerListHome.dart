@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'AppLocalizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'CustomerDatabase.dart';
 import 'CustomerBase.dart';
 import 'CustomerInfo.dart';
@@ -73,10 +73,12 @@ class _CustomerListHome extends State<CustomerListHome> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: Text(AppLocalizations.of(context)!.translate("title")!),
+        title: Text(localizations.title),
         actions: [
           PopupMenuButton<Locale>(
             onSelected: _changeLanguage,
@@ -108,7 +110,7 @@ class _CustomerListHome extends State<CustomerListHome> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: navigateToAdd,
-            tooltip: AppLocalizations.of(context)!.translate("add_customer")!,
+            tooltip: localizations.addCustomer,
           ),
           IconButton(
             icon: const Icon(Icons.help_outline),
@@ -120,7 +122,7 @@ class _CustomerListHome extends State<CustomerListHome> {
         children: [
           Expanded(
             child: customerList.isEmpty
-                ? Center(child: Text(AppLocalizations.of(context)!.translate("no_customer")!))
+                ? Center(child: Text(localizations.noCustomer))
                 : ListView.builder(
               itemCount: customerList.length,
               itemBuilder: (context, index) {
@@ -128,8 +130,8 @@ class _CustomerListHome extends State<CustomerListHome> {
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text("${AppLocalizations.of(context)!.translate('Details')!} ${customer.item}"),
-                    subtitle: Text("${AppLocalizations.of(context)!.translate('customer_id')!} ${customer.id}"),
+                    title: Text("${localizations.details} ${customer.item}"),
+                    subtitle: Text("${localizations.customerId} ${customer.id}"),
                     onTap: () => selectCustomer(customer),
                   ),
                 );
@@ -141,7 +143,7 @@ class _CustomerListHome extends State<CustomerListHome> {
               flex: 2,
               child: selectedCustomer == null
                   ?  Center(
-                  child: Text(AppLocalizations.of(context)!.translate("select_customer")!)): CustomerDetailsScreen(
+                  child: Text(localizations.customerDetails)): CustomerDetailsScreen(
                 customer: selectedCustomer!,
                 onUpdate: loadCustomers,
               ),
@@ -153,16 +155,18 @@ class _CustomerListHome extends State<CustomerListHome> {
 
   /// method to create a button that have the page instructions
   void showInstructions(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.translate("instructions_title")!),
-          content: Text(AppLocalizations.of(context)!.translate("instructions_1")!),
+          title: Text(localizations.instructionsTitleAbbas),
+          content: Text(localizations.customerInstructions),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.translate("OK")!),
+              child: Text(localizations.ok),
             ),
           ],
         );

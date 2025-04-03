@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'AppLocalizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'CustomerBase.dart';
 import 'CustomerDatabase.dart';
 import 'CustomerInfo.dart';
+
 ///screen to display customer details plus buttons for delete and update
 class CustomerDetailsScreen extends StatefulWidget {
   ///the customer that details will shows up
@@ -33,19 +34,19 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)!.translate("delete_customer")!),
-          content: Text(AppLocalizations.of(context)!.translate("confirm_delete")!),
+          title: Text(AppLocalizations.of(context)!.deleteCustomer),
+          content: Text(AppLocalizations.of(context)!.confirmDelete),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.translate("Cancel")!),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () async {
                 Navigator.pop(context);
                 await deleteCustomer();
               },
-              child: Text(AppLocalizations.of(context)!.translate("delete")!, style: TextStyle(color: Colors.red)),
+              child: Text(AppLocalizations.of(context)!.delete, style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -85,17 +86,17 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
       appBar: MediaQuery.of(context).size.width > 600
           ? null
           : AppBar(
-        title: Text(AppLocalizations.of(context)!.translate("Customer Details")!),
+        title: Text(AppLocalizations.of(context)!.customerDetails),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${AppLocalizations.of(context)!.translate("first_name")!} ${data[0]}", style: const TextStyle(fontSize: 18)),
-            Text("${AppLocalizations.of(context)!.translate("last_name")!} ${data[1]}", style: const TextStyle(fontSize: 18)),
-            Text("${AppLocalizations.of(context)!.translate("address")!} ${data[2]}", style: const TextStyle(fontSize: 18)),
-            Text("${AppLocalizations.of(context)!.translate('birthday')!} ${data[3]}", style: const TextStyle(fontSize: 18)),
+            Text("${AppLocalizations.of(context)!.firstName} ${data[0]}", style: const TextStyle(fontSize: 18)),
+            Text("${AppLocalizations.of(context)!.lastName} ${data[1]}", style: const TextStyle(fontSize: 18)),
+            Text("${AppLocalizations.of(context)!.address} ${data[2]}", style: const TextStyle(fontSize: 18)),
+            Text("${AppLocalizations.of(context)!.birthday} ${data[3]}", style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 20),
 
             ///buttons for delete and update
@@ -105,13 +106,13 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 ElevatedButton.icon(
                   onPressed: navigateToEdit,
                   icon: const Icon(Icons.edit, color: Colors.white),
-                  label: Text(AppLocalizations.of(context)!.translate("edit_customer")!, style: TextStyle(color: Colors.white)),
+                  label: Text(AppLocalizations.of(context)!.editCustomer, style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                 ),
                 ElevatedButton.icon(
                   onPressed: confirmDelete,
                   icon: const Icon(Icons.delete, color: Colors.white),
-                  label: Text(AppLocalizations.of(context)!.translate("delete_customer")!, style: TextStyle(color: Colors.white)),
+                  label: Text(AppLocalizations.of(context)!.deleteCustomer, style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 ),
               ],
@@ -119,7 +120,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.translate("back_button")!),
+              child: Text(AppLocalizations.of(context)!.backButton),
             ),
           ],
         ),

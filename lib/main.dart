@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/eventPlanner_localizations.dart';
 
@@ -6,6 +7,10 @@ import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerF
 import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerHome.dart';
 import 'package:mobile_programming_final_project/view/eventPlanner/eventdatabase.dart';
 import 'package:mobile_programming_final_project/view/expenseTracker/ExpenseTrackerHome.dart';
+import 'pages/home_page.dart';
+import 'pages/expense_page.dart';
+import 'pages/add_expense.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +39,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Event Planner App',
+
+      title: 'Group project',
+ 
+
       debugShowCheckedModeBanner: false,
       locale: _locale,
       supportedLocales: const [
@@ -50,6 +58,10 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        textTheme: const TextTheme(
+          headlineMedium: TextStyle(fontSize: 24.0),
+          bodyLarge: TextStyle(fontSize: 16.0),
+        ),
       ),
       initialRoute: '/',
       routes: {
@@ -58,7 +70,8 @@ class _MyAppState extends State<MyApp> {
           eventdatabase: widget.eventdatabase,
           onLocaleChange: _changeLocale,
         ),
-        '/expense': (context) => Expensetrackerhome(),
+        '/expense': (context) => const ExpensePage(),
+        '/add-expense': (context) => AddExpensePage(),
         '/eventplannerform': (context) => EventPlannerForm(
           eventdatabase: widget.eventdatabase,
         ),

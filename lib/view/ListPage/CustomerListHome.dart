@@ -4,60 +4,22 @@ import 'CustomerDatabase.dart';
 import 'CustomerBase.dart';
 import 'CustomerInfo.dart';
 import 'CustomerDetailsScreen.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-
 class CustomerListHome extends StatefulWidget {
-  const CustomerListHome({super.key});
-
-  static void setLocale(BuildContext context, Locale newLocale) async {
-    _CustomerListHome? state = context.findAncestorStateOfType<_CustomerListHome>();
-    state?.changeLanguage(newLocale);
-  }
+  final void Function(Locale) onLocaleChange;
+  const CustomerListHome({super.key, required this.onLocaleChange});
 
   @override
   State<CustomerListHome> createState() => _CustomerListHome();
 }
 
 class _CustomerListHome extends State<CustomerListHome> {
-  var _locale = Locale("en", "US");
-
-  void changeLanguage(Locale newLocale) {
-    setState(() {
-      _locale = newLocale;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      supportedLocales: const [
-        Locale('en', "US"),
-        Locale('fr', "FR"),
-      ],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      locale: _locale,
-      home: const MyHomePage(title: 'Customer List'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   late final Future<CustomerDatabase> database;
   List<CustomerBase> customerList = [];
   CustomerBase? selectedCustomer;
+
+  void _changeLanguage(Locale locale) {
+    widget.onLocaleChange(locale);
+  }
 
   @override
   void initState() {
@@ -66,6 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
     loadCustomers();
   }
 
+  /// method to get all the customers
   Future<void> loadCustomers() async {
     final db = await database;
     final customerDAO = db.customerDAO;
@@ -74,8 +37,13 @@ class _MyHomePageState extends State<MyHomePage> {
       customerList = customers;
     });
   }
+  bool get isTabletOrDesktop {
+    final mediaQuery = MediaQuery.of(context);
+    return mediaQuery.size.width > 600; // Typical breakpoint for tablets
+  }
 
-  void selectCustomer(CustomerBase customer, bool isTabletOrDesktop) {
+  ///method to change the display when selecting a customer based on the size of the screen
+  void selectCustomer(CustomerBase customer) {
     if (isTabletOrDesktop) {
       setState(() {
         selectedCustomer = customer;
@@ -93,11 +61,12 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  /// Navigates to the customerInfo to add new customer.
   void navigateToAdd() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const CustomerInfo(),
+        builder: (context) => CustomerInfo(),
       ),
     ).then((_) => loadCustomers());
   }
@@ -109,22 +78,41 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Colors.blue,
         title: Text(AppLocalizations.of(context)!.translate("title")!),
         actions: [
-          OutlinedButton(
-            child: Text(AppLocalizations.of(context)!.translate("English")!),
-            onPressed: () {
-              CustomerListHome.setLocale(context, Locale('en', "US"));
-            },
-          ),
-          OutlinedButton(
-            child: Text(AppLocalizations.of(context)!.translate("French")!),
-            onPressed: () {
-              CustomerListHome.setLocale(context, Locale('fr', "FR"));
-            },
+          PopupMenuButton<Locale>(
+            onSelected: _changeLanguage,
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<Locale>>[
+              PopupMenuItem<Locale>(
+                value: const Locale('en'),
+                child: Row(
+                  children: [
+                    Icon(Icons.language, color: Colors.blue),
+                    const SizedBox(width: 10),
+                    Text('English', style: TextStyle(color: Colors.blue)),
+                  ],
+                ),
+              ),
+              PopupMenuItem<Locale>(
+                value: const Locale('fr'),
+                child: Row(
+                  children: [
+                    Icon(Icons.language, color: Colors.red),
+                    const SizedBox(width: 10),
+                    Text('Français', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
+            icon: Icon(Icons.language, color: Colors.black),
+            offset: Offset(0, 50), // Adjust position
           ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: navigateToAdd,
             tooltip: AppLocalizations.of(context)!.translate("add_customer")!,
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => showInstructions(context),
           ),
         ],
       ),
@@ -132,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Expanded(
             child: customerList.isEmpty
-                ? Center(child: Text("No customer available"))
+                ? Center(child: Text(AppLocalizations.of(context)!.translate("no_customer")!))
                 : ListView.builder(
               itemCount: customerList.length,
               itemBuilder: (context, index) {
@@ -140,45 +128,41 @@ class _MyHomePageState extends State<MyHomePage> {
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text("Details: ${customer.item}"),
-                    subtitle: Text("Customer ID: ${customer.id}"),
-                    onTap: () => selectCustomer(customer, true),
+                    title: Text("${AppLocalizations.of(context)!.translate('Details')!} ${customer.item}"),
+                    subtitle: Text("${AppLocalizations.of(context)!.translate('customer_id')!} ${customer.id}"),
+                    onTap: () => selectCustomer(customer),
                   ),
                 );
               },
             ),
           ),
-          // if (isTabletOrDesktop)
-          //   Expanded(
-          //     flex: 2,
-          //     child: selectedCustomer == null
-          //         ?  Center(
-          //         child: Text("Select a customer to view details")): CustomerDetailsScreen(
-          //       customer: selectedCustomer!,
-          //       onUpdate: () {},
-          //     ),
-          //   ),
+          if (isTabletOrDesktop)
+            Expanded(
+              flex: 2,
+              child: selectedCustomer == null
+                  ?  Center(
+                  child: Text(AppLocalizations.of(context)!.translate("select_customer")!)): CustomerDetailsScreen(
+                customer: selectedCustomer!,
+                onUpdate: loadCustomers,
+              ),
+            ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: navigateToAdd,
-        tooltip: "Add Customer",
-        child: const Icon(Icons.add),
       ),
     );
   }
 
+  /// method to create a button that have the page instructions
   void showInstructions(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("How to Use the Interface"),
-          content: Text("1. Tap '+' to add a new customer.\n2. Tap on a customer to view details and manage it."),
+          title: Text(AppLocalizations.of(context)!.translate("instructions_title")!),
+          content: Text(AppLocalizations.of(context)!.translate("instructions_1")!),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("OK"),
+              child: Text(AppLocalizations.of(context)!.translate("OK")!),
             ),
           ],
         );

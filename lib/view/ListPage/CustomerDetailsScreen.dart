@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'AppLocalizations.dart';
 import 'CustomerBase.dart';
 import 'CustomerDatabase.dart';
 import 'CustomerInfo.dart';
-
 ///screen to display customer details plus buttons for delete and update
 class CustomerDetailsScreen extends StatefulWidget {
-
-
   ///the customer that details will shows up
   final CustomerBase customer;
 
@@ -25,9 +21,6 @@ class CustomerDetailsScreen extends StatefulWidget {
 class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
   late Future<CustomerDatabase> database;
 
-  var _locale = Locale("en", "US");
-
-
   @override
   void initState() {
     super.initState();
@@ -40,22 +33,21 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-            title: Text("Confirm Delete"),
-            content: Text("Are you sure you want to delete this customer?"),
-        actions: [
-        TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: Text("Cancel"),
-        ),
-        TextButton(
-        onPressed: () async {
-        // Close dialog
-        Navigator.pop(context);
-        await deleteCustomer();
-        },
-        child: const Text("Delete", style: TextStyle(color: Colors.red)),
-        ),
-        ],
+          title: Text(AppLocalizations.of(context)!.translate("delete_customer")!),
+          content: Text(AppLocalizations.of(context)!.translate("confirm_delete")!),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.translate("Cancel")!),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                await deleteCustomer();
+              },
+              child: Text(AppLocalizations.of(context)!.translate("delete")!, style: TextStyle(color: Colors.red)),
+            ),
+          ],
         );
       },
     );
@@ -67,9 +59,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
     final customerDAO = db.customerDAO;
     await customerDAO.deleteThisCustomer(widget.customer);
 
-    // Refresh the list
     widget.onUpdate();
-    // Close details screen
     Navigator.pop(context);
   }
 
@@ -78,12 +68,12 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CustomerInfo(customer: widget.customer),
+        builder: (context) => CustomerInfo(
+          customer: widget.customer,
+        ),
       ),
     ).then((_) {
-      // Refresh list after update
       widget.onUpdate();
-      // Close details screen after update
       Navigator.pop(context);
     });
   }
@@ -91,63 +81,49 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final data = widget.customer.item.split(',');
-    return MaterialApp(
-        supportedLocales: const [
-          Locale('en', 'US'),
-          Locale('fr', "FR"),
-        ],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        locale: _locale,
+    return Scaffold(
+      appBar: MediaQuery.of(context).size.width > 600
+          ? null
+          : AppBar(
+        title: Text(AppLocalizations.of(context)!.translate("Customer Details")!),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("${AppLocalizations.of(context)!.translate("first_name")!} ${data[0]}", style: const TextStyle(fontSize: 18)),
+            Text("${AppLocalizations.of(context)!.translate("last_name")!} ${data[1]}", style: const TextStyle(fontSize: 18)),
+            Text("${AppLocalizations.of(context)!.translate("address")!} ${data[2]}", style: const TextStyle(fontSize: 18)),
+            Text("${AppLocalizations.of(context)!.translate('birthday')!} ${data[3]}", style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 20),
 
-
-        home:  Scaffold(
-          appBar: MediaQuery.of(context).size.width > 600
-              ? null // No AppBar for tablet/desktop
-              : AppBar(title: Text("Customer Details"),),
-
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            ///buttons for delete and update
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text("${'First Name: '} ${data[0]}", style: const TextStyle(fontSize: 18)),
-                Text("${'Last Name: '} ${data[1]}", style: const TextStyle(fontSize: 18)),
-                Text("${'Address: '} ${data[2]}", style: const TextStyle(fontSize: 18)),
-                Text("${'Birthday: '} ${data[3]}", style: const TextStyle(fontSize: 18)),
-                const SizedBox(height: 20),
-
-                ///buttons for delete and update
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: navigateToEdit,
-                      icon: const Icon(Icons.edit, color: Colors.white),
-                      label: Text('Edit Customer', style: TextStyle(color: Colors.white),),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: confirmDelete,
-                      icon: const Icon(Icons.delete, color: Colors.white),
-                      label: Text('Delete Customer', style: TextStyle(color: Colors.white),),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                    ),
-                  ],
+                ElevatedButton.icon(
+                  onPressed: navigateToEdit,
+                  icon: const Icon(Icons.edit, color: Colors.white),
+                  label: Text(AppLocalizations.of(context)!.translate("edit_customer")!, style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                 ),
-
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Back'),
+                ElevatedButton.icon(
+                  onPressed: confirmDelete,
+                  icon: const Icon(Icons.delete, color: Colors.white),
+                  label: Text(AppLocalizations.of(context)!.translate("delete_customer")!, style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 ),
               ],
             ),
-          ),
-        )
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.translate("back_button")!),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

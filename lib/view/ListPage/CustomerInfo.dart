@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'AppLocalizations.dart';
 import 'CustomerDatabase.dart';
 import 'CustomerBase.dart';
-import 'repository.dart'; // Import Repository
+import 'repository.dart';
 
 ///class for adding or editing customer information
 class CustomerInfo extends StatefulWidget {
@@ -18,14 +17,6 @@ class CustomerInfo extends StatefulWidget {
 }
 
 class _CustomerInfo extends State<CustomerInfo> {
-  var _locale = Locale("en", "US");
-
-  void changeLanguage(Locale newLocale) {
-    setState(() {
-      _locale = newLocale;
-    });
-  }
-
   late final Future<CustomerDatabase> database;
   late TextEditingController firstNameController;
   late TextEditingController lastNameController;
@@ -63,7 +54,6 @@ class _CustomerInfo extends State<CustomerInfo> {
     }
   }
 
-
   ///load last customer saved data
   Future<void> loadPreviousCustomer() async {
     final previousData = await repository.loadProfileData();
@@ -83,26 +73,29 @@ class _CustomerInfo extends State<CustomerInfo> {
     final db = await database;
     final customerDAO = db.customerDAO;
     final customerData =
-        '${firstNameController.text},${lastNameController
-        .text},${addressController.text},${birthdayController.text}';
+        '${firstNameController.text},${lastNameController.text},${addressController.text},${birthdayController.text}';
 
     if (customerId == null) {
       // auto increment ID
       final newCustomer = CustomerBase(null, customerData);
       await customerDAO.insertCustomer(newCustomer);
 
-      // Show success Snackbar
+      // Show success SnackBar before navigation
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Customer has been added successfully!"),
+          content: Text(AppLocalizations.of(context)!.translate("save_customer")!),
           duration: Duration(seconds: 2),
           backgroundColor: Colors.green,
         ),
       );
+
+      // Delay the navigation to allow SnackBar to be visible
+      await Future.delayed(Duration(milliseconds: 2200));
     } else {
       final updatedCustomer = CustomerBase(customerId!, customerData);
       await customerDAO.updateCustomer(updatedCustomer);
     }
+
     // Save customer details in EncryptedSharedPreferences
     await repository.saveProfileData(
       firstNameController.text,
@@ -111,31 +104,18 @@ class _CustomerInfo extends State<CustomerInfo> {
       birthdayController.text,
     );
 
-    Navigator.pop(context);
+    // Only pop after everything is done
+    if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('fr', "FR"),
-      ],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ],
-      locale: _locale,
-      home: buildCustomerForm(context), // Call the separate build function
-    );
-  }
-
-  Widget buildCustomerForm(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: Text(customerId == null ? "Add Customer" : "Edit Customer"),
+        title: Text(customerId == null
+            ? AppLocalizations.of(context)!.translate("add_customer")!
+            : AppLocalizations.of(context)!.translate("edit_customer")!),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -145,27 +125,35 @@ class _CustomerInfo extends State<CustomerInfo> {
             children: <Widget>[
               TextFormField(
                 controller: firstNameController,
-                decoration: InputDecoration(labelText: 'first_name'),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.translate("first_name")!,
+                ),
                 validator: (value) =>
-                value!.isEmpty ? "This field cannot be empty" : null,
+                value!.isEmpty ? AppLocalizations.of(context)!.translate("empty_value")! : null,
               ),
               TextFormField(
                 controller: lastNameController,
-                decoration: const InputDecoration(labelText: 'Last Name'),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.translate("last_name")!,
+                ),
                 validator: (value) =>
-                value!.isEmpty ? "This field cannot be empty" : null,
+                value!.isEmpty ? AppLocalizations.of(context)!.translate("empty_value")! : null,
               ),
               TextFormField(
                 controller: addressController,
-                decoration: const InputDecoration(labelText: 'Address'),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.translate("address")!,
+                ),
                 validator: (value) =>
-                value!.isEmpty ? "This field cannot be empty" : null,
+                value!.isEmpty ? AppLocalizations.of(context)!.translate("empty_value")! : null,
               ),
               TextFormField(
                 controller: birthdayController,
-                decoration: const InputDecoration(labelText: 'Birthday'),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.translate("birthday")!,
+                ),
                 validator: (value) =>
-                value!.isEmpty ? "This field cannot be empty" : null,
+                value!.isEmpty ? AppLocalizations.of(context)!.translate("empty_value")! : null,
               ),
               const SizedBox(height: 20),
               Row(
@@ -174,12 +162,12 @@ class _CustomerInfo extends State<CustomerInfo> {
                   ElevatedButton(
                     onPressed: saveProfileData,
                     child: Text(customerId == null
-                        ? "Save Customer"
-                        : "Update Customer"),
+                        ? AppLocalizations.of(context)!.translate("save_customer")!
+                        : AppLocalizations.of(context)!.translate("update_customer")!),
                   ),
                   ElevatedButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text('back'),
+                    child: Text(AppLocalizations.of(context)!.translate("back_button")!),
                   ),
                 ],
               ),

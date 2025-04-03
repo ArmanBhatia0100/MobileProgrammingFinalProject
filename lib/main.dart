@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:mobile_programming_final_project/view/ListPage/AppLocalizations.dart';
 import 'package:mobile_programming_final_project/view/ListPage/CustomerListHome.dart';
 import 'package:mobile_programming_final_project/view/expenseTracker/ExpenseTrackerHome.dart';
 
@@ -6,23 +8,50 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale _locale = const Locale('en'); // Default language
+
+  void _changeLocale(Locale newLocale) {
+    setState(() {
+      _locale = newLocale;
+    });
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Event Planner App',
       debugShowCheckedModeBanner: false,
+      locale: _locale,
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('fr'), // French
+      ],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      initialRoute: '/',
       routes:{
         "/":(context)=>const MyHomePage(title: 'Team One Final project'),
-  "/expense":(context)=>const Expensetrackerhome(),
-        "/customer":(context)=>const CustomerListHome(),
+        "/expense":(context)=>const Expensetrackerhome(),
+        "/customer":(context)=> CustomerListHome(
+          onLocaleChange: _changeLocale,
+        ),
       } ,
     );
   }
@@ -47,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(child:
-        Column(mainAxisAlignment:MainAxisAlignment.spaceEvenly,children: [
+      Column(mainAxisAlignment:MainAxisAlignment.spaceEvenly,children: [
         OutlinedButton(onPressed: (){}, child: Text("Page 1")),
         OutlinedButton(onPressed: (){
           Navigator.pushNamed(context, "/customer");
@@ -55,9 +84,9 @@ class _MyHomePageState extends State<MyHomePage> {
         OutlinedButton(onPressed: (){
           Navigator.pushNamed(context, "/expense");
         }, child: Text("Expense Tracker")),
-        OutlinedButton(onPressed: (){}, child: Text("Page 3"))
+        OutlinedButton(onPressed: (){}, child: Text("Page 4"))
       ],),),
-       // This trailing comma makes auto-formatting nicer for build methods.
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

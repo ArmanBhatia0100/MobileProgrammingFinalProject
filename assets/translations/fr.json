@@ -6,7 +6,7 @@
   "customer_id": "ID du client: ",
   "select_customer": "Sélectionnez un client pour voir les détails",
   "instructions_title": "Comment utiliser l'interface",
-  "instructions_1": "1. Appuyez sur '+' pour ajouter un nouveau client.\n 2. Appuyez sur un client pour voir les détails, le supprimer ou le mettre à jour.\n",
+  "instructions_1": "1. Appuyez sur '+' pour ajouter un nouveau client. \n\n2. Appuyez sur un client pour voir les détails, le supprimer ou le mettre à jour.",
   "edit_customer": "Modifier le client",
   "delete_customer": "Supprimer le client",
   "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce client ?",
@@ -20,5 +20,8 @@
   "empty_value": "Ce champ ne peut pas être vide",
   "save_customer": "Enregistrer le client",
   "update_customer": "Mettre à jour le client",
-  "OK": "Oui"
+  "OK": "Oui",
+  "Customer Details": "Détails du client",
+  "delete": "supprimer",
+  "Cancel": "Annuler"
 }

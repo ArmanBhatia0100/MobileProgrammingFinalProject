@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'vehicle.dart'; // Model
 import 'vehicle_database.dart'; // Floor DB
 import 'vehicle_dao.dart'; // DAO
-import 'vehicleMaintenanceForm.dart'; // Form screen
+import 'vehicle_maintenance_form.dart'; // Form screen
 
 // Week 9/Final Project: Home Page to list all vehicle maintenance records
 class VehicleMaintenanceHome extends StatefulWidget {
@@ -39,31 +39,34 @@ class _VehicleMaintenanceHomeState extends State<VehicleMaintenanceHome> {
   }
 
   Future<void> _deleteRecord(MaintenanceRecord record) async {
+    final messenger = ScaffoldMessenger.of(context); // Save early
+
     await dao.deleteRecord(record);
     await _loadRecords();
     setState(() {
       selectedRecord = null;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
+
+    messenger.showSnackBar(
       const SnackBar(content: Text("Record deleted")),
     );
   }
 
+
   void _navigateToForm({MaintenanceRecord? record}) async {
-    final updated = await Navigator.push(
-      context,
+    final navigator = Navigator.of(context); // Save context before async gap
+
+    final updated = await navigator.push(
       MaterialPageRoute(
         builder: (context) => VehicleMaintenanceForm(
           record: record,
-          onSave: (savedRecord) async {
-            if (savedRecord.id == null) {
-              await dao.insertRecord(savedRecord);
+          onSave: (updatedRecord) async {
+            if (record == null) {
+              await dao.insertRecord(updatedRecord);
             } else {
-              await dao.updateRecord(savedRecord);
+              await dao.updateRecord(updatedRecord);
             }
-
-            // Indicate success to refresh the list
-            Navigator.pop(context, true);
+            navigator.pop(true); // Return true to trigger refresh
           },
         ),
       ),

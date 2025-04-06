@@ -54,15 +54,26 @@ class _VehicleMaintenanceHomeState extends State<VehicleMaintenanceHome> {
       context,
       MaterialPageRoute(
         builder: (context) => VehicleMaintenanceForm(
-          dao: dao,
           record: record,
+          onSave: (savedRecord) async {
+            if (savedRecord.id == null) {
+              await dao.insertRecord(savedRecord);
+            } else {
+              await dao.updateRecord(savedRecord);
+            }
+
+            // Indicate success to refresh the list
+            Navigator.pop(context, true);
+          },
         ),
       ),
     );
+
     if (updated == true) {
       await _loadRecords();
     }
   }
+
 
   // Week 9: Responsive layout handler
   Widget _reactiveLayout(BuildContext context) {

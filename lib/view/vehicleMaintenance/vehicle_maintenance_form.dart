@@ -32,8 +32,9 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
     _typeController = TextEditingController(text: record?.vehicleType ?? "");
     _serviceTypeController = TextEditingController(text: record?.serviceType ?? "");
     _dateController = TextEditingController(text: record?.serviceDate ?? "");
-    _mileageController = TextEditingController(text: record?.mileage?.toString() ?? "");
-    _costController = TextEditingController(text: record?.cost?.toString() ?? "");
+    _costController = TextEditingController(text: record == null ? "" : record.cost.toString());
+    _mileageController = TextEditingController(text: record == null ? "" : record.mileage.toString());
+
   }
 
   @override

@@ -96,7 +96,7 @@ class _$CustomerDatabase extends CustomerDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `CustomerBase` (`id` INTEGER NOT NULL, `item` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `CustomerBase` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `item` TEXT NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -147,9 +147,9 @@ class _$CustomerDAO extends CustomerDAO {
 
   @override
   Future<List<CustomerBase>> getAllItems() async {
-    return _queryAdapter.queryList('SELECT * from CustomerBase',
+    return _queryAdapter.queryList('SELECT * FROM CustomerBase',
         mapper: (Map<String, Object?> row) =>
-            CustomerBase(row['id'] as int, row['item'] as String));
+            CustomerBase(row['id'] as int?, row['item'] as String));
   }
 
   @override

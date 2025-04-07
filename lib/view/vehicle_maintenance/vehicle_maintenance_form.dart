@@ -4,7 +4,7 @@ import 'package:mobile_programming_final_project/view/vehicle_maintenance/vehicl
 import 'vehicle_repository.dart';
 
 class VehicleMaintenanceForm extends StatefulWidget {
-  final MaintenanceRecord? record;
+  final MaintenanceRecord? record; // null = add, not null = edit
   final Function(MaintenanceRecord) onSave;
 
   const VehicleMaintenanceForm({
@@ -25,6 +25,8 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
   late final TextEditingController _mileageController;
   late final TextEditingController _costController;
   late final VehicleRepository repository;
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -75,16 +77,11 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
         mileage: _mileageController.text,
         cost: _costController.text,
       );
-// Ensures widget still exists before doing context-based calls
-      if (!mounted) return;
 
       widget.onSave(record);
-      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.invalidInputMessage),
-        ),
+        SnackBar(content: Text(AppLocalizations.of(context)!.invalidInputMessage)),
       );
     }
   }
@@ -101,44 +98,110 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
         title: Text(widget.record == null
-            ? AppLocalizations.of(context)!.addMaintenance
-            : AppLocalizations.of(context)!.editMaintenance),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildTextField(_nameController, AppLocalizations.of(context)!.vehicleName),
-            _buildTextField(_typeController, AppLocalizations.of(context)!.vehicleType),
-            _buildTextField(_serviceTypeController, AppLocalizations.of(context)!.serviceType),
-            _buildTextField(_dateController, AppLocalizations.of(context)!.serviceDate),
-            _buildTextField(_mileageController, AppLocalizations.of(context)!.mileage, isNumeric: true),
-            _buildTextField(_costController, AppLocalizations.of(context)!.cost, isNumeric: true),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _loadPreviousData,
-              child: Text(AppLocalizations.of(context)!.loadPrevious),
-            ),
-            ElevatedButton(
+            ? localizations.addMaintenance
+            : localizations.editMaintenance),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: localizations.loadPrevious,
+            onPressed: _loadPreviousData,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
               onPressed: _submitForm,
-              child: Text(AppLocalizations.of(context)!.save),
+              child: Text(widget.record == null
+                  ? localizations.add
+                  : localizations.save),
             ),
-          ],
+          )
+        ],
+      ),
+      body: SafeArea(
+        child: Scrollbar(
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(30.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(labelText: localizations.vehicleName),
+                    validator: (value) =>
+                    value == null || value.isEmpty ? localizations.emptyValue : null,
+                  ),
+                  TextFormField(
+                    controller: _typeController,
+                    decoration: InputDecoration(labelText: localizations.vehicleType),
+                    validator: (value) =>
+                    value == null || value.isEmpty ? localizations.emptyValue : null,
+                  ),
+                  TextFormField(
+                    controller: _serviceTypeController,
+                    decoration: InputDecoration(labelText: localizations.serviceType),
+                    validator: (value) =>
+                    value == null || value.isEmpty ? localizations.emptyValue : null,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      final pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null) {
+                        setState(() {
+                          _dateController.text = pickedDate.toString().split(' ')[0];
+                        });
+                      }
+                    },
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        controller: _dateController,
+                        decoration: InputDecoration(
+                          labelText: localizations.serviceDate,
+                          suffixIcon: const Icon(Icons.calendar_today),
+                        ),
+                        validator: (value) => value == null || value.isEmpty
+                            ? localizations.emptyValue
+                            : null,
+                      ),
+                    ),
+                  ),
+                  TextFormField(
+                    controller: _mileageController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(labelText: localizations.mileage),
+                    validator: (value) =>
+                    value == null || value.isEmpty ? localizations.emptyValue : null,
+                  ),
+                  TextFormField(
+                    controller: _costController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(labelText: localizations.cost),
+                    validator: (value) =>
+                    value == null || value.isEmpty ? localizations.emptyValue : null,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
-    );
-  }
 
-  Widget _buildTextField(TextEditingController controller, String label, {bool isNumeric = false}) {
-    return TextField(
-      controller: controller,
-      keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-      decoration: InputDecoration(labelText: label),
     );
   }
 }

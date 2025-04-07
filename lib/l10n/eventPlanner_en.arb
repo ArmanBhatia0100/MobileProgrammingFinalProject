@@ -72,8 +72,8 @@
   "update": "Update",
   "loadPrevious": "Load Previous",
   "invalidInputMessage": "Please enter valid mileage and cost values.",
-  "vehicleInstructions": "1. Press + to add a new maintenance record.\n\n2. Tap on a record to view and manage it.",
+  "vehicleInstructions": "1. Press + to add a new maintenance record.\n\n2. Tap on a record to view and manage it (update, delete, or close).\n\n3. Tap the globe 🌐 icon to switch language.\n\n4. Tap the question mark ❓ for help.\n\n5. Use the refresh 🔄 icon to prefill the form with the last saved record.",
   "deletedMessage": "Record deleted successfully.",
-  "deleteRecord": "Delete Record"
-
+  "deleteRecord": "Delete Record",
+  "noRecords": "No records found"
 }

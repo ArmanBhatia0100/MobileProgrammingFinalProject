@@ -68,7 +68,8 @@
   "update": "Modifier",
   "loadPrevious": "Charger les données précédentes",
   "invalidInputMessage": "Veuillez entrer un kilométrage et un coût valides.",
-  "vehicleInstructions": "1. Appuyez sur + pour ajouter un nouvel enregistrement d'entretien.\n\n2. Appuyez sur un enregistrement pour le consulter et le gérer.",
+  "vehicleInstructions": "1. Appuyez sur + pour ajouter un nouvel enregistrement d'entretien.\n\n2. Appuyez sur un enregistrement pour le consulter et le gérer (modifier, supprimer ou fermer).\n\n3. Appuyez sur l'icône 🌐 pour changer la langue.\n\n4. Appuyez sur le point d'interrogation ❓ pour obtenir de l'aide.\n\n5. Clickez 🔄 pour préremplir le formulaire avec le dernier enregistrement sauvegardé.",
   "deletedMessage": "Enregistrement supprimé avec succès.",
-  "deleteRecord": "Supprimer l'enregistrement"
+  "deleteRecord": "Supprimer l'enregistrement",
+  "noRecords": "Aucun enregistrement trouvé"
 }

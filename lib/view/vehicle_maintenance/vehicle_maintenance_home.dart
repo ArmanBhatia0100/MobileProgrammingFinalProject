@@ -104,41 +104,97 @@ class _VehicleMaintenanceHomeState extends State<VehicleMaintenanceHome> {
     }
   }
 
+  void _showInstructions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.instructionsTitle),
+        content: Text(AppLocalizations.of(context)!.vehicleInstructions),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.ok),
+          ),
+        ],
+      ),
+    );
+  }
 
-  // Week 9: Responsive layout handler
   Widget _reactiveLayout(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isWideScreen = size.width > size.height && size.width > 720;
+    final localizations = AppLocalizations.of(context)!;
 
-    if (isWideScreen) {
-      // Master-Detail layout for tablet
-      return Row(
+    final listWidget = ListView.builder(
+      itemCount: records.length,
+      itemBuilder: (context, index) {
+        final record = records[index];
+        return ListTile(
+          title: Text(record.vehicleName),
+          subtitle: Text("${record.serviceType} - ${record.serviceDate}"),
+          onTap: () {
+            setState(() {
+              selectedRecord = record;
+            });
+          },
+        );
+      },
+    );
+
+    final detailsWidget = selectedRecord != null
+        ? Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
-            child: _buildList(),
-          ),
-          Expanded(
-            flex: 3,
-            child: selectedRecord != null
-                ? _buildDetails(selectedRecord!)
-                : const Center(child: Text("Select a record")),
-          ),
+          Text("Vehicle: ${selectedRecord!.vehicleName}",
+              style: Theme.of(context).textTheme.headlineMedium),
+          Text("Type: ${selectedRecord!.vehicleType}"),
+          Text("Service: ${selectedRecord!.serviceType}"),
+          Text("Date: ${selectedRecord!.serviceDate}"),
+          Text("Mileage: ${selectedRecord!.mileage} km"),
+          Text("Cost: \$${selectedRecord!.cost}"),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: () => _navigateToForm(record: selectedRecord),
+                child: Text(localizations.update),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () => _deleteRecord(selectedRecord!),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: Text(localizations.delete),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () => setState(() => selectedRecord = null),
+                child: Text(localizations.close),
+              ),
+            ],
+          )
         ],
-      );
-    } else {
-      // Portrait mode or phone layout
-      return selectedRecord == null ? _buildList() : _buildDetails(selectedRecord!);
-    }
-  }
-
-  Widget _buildList() {
+      ),
+    )
+        : const Center(child: Text("Select a record"));
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.vehicleRecords),
+        backgroundColor: Colors.blue,
+        title: Text(localizations.vehicleRecords),
         actions: [
-          PopupMenuButton<Locale>(
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: localizations.addMaintenance,
+            onPressed: () => _navigateToForm(),
+          ),
+          IconButton(
             icon: const Icon(Icons.help_outline),
+            tooltip: localizations.instructionsTitle,
+            onPressed: () => _showInstructions(context),
+          ),
+          PopupMenuButton<Locale>(
+            icon: const Icon(Icons.language),
             onSelected: _changeLanguage,
             itemBuilder: (context) => [
               PopupMenuItem(
@@ -154,95 +210,22 @@ class _VehicleMaintenanceHomeState extends State<VehicleMaintenanceHome> {
         ],
       ),
       body: records.isEmpty
-          ? const Center(child: Text("No records found"))
-          : ListView.builder(
-        itemCount: records.length,
-        itemBuilder: (context, index) {
-          final record = records[index];
-          return ListTile(
-            title: Text(record.vehicleName),
-            subtitle: Text("${record.serviceType} - ${record.serviceDate}"),
-            onTap: () {
-              setState(() {
-                selectedRecord = record;
-              });
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToForm(),
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildDetails(MaintenanceRecord record) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.maintenanceDetails),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            tooltip: AppLocalizations.of(context)!.instructionsTitle,
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(AppLocalizations.of(context)!.instructionsTitle),
-                  content: Text(AppLocalizations.of(context)!.vehicleInstructions),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(AppLocalizations.of(context)!.ok),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+          ? Center(child: Text(localizations.noRecords))
+          : isWideScreen
+          ? Row(
+        children: [
+          Expanded(flex: 2, child: listWidget),
+          const VerticalDivider(width: 1),
+          Expanded(flex: 3, child: detailsWidget),
         ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Vehicle: ${record.vehicleName}", style: Theme.of(context).textTheme.headlineMedium),
-            Text("Type: ${record.vehicleType}"),
-            Text("Service: ${record.serviceType}"),
-            Text("Date: ${record.serviceDate}"),
-            Text("Mileage: ${record.mileage} km"),
-            Text("Cost: \$${record.cost}"),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: () => _navigateToForm(record: record),
-                  child: Text(AppLocalizations.of(context)!.update),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _deleteRecord(record),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: Text(AppLocalizations.of(context)!.delete),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => setState(() => selectedRecord = null),
-                  child: Text(AppLocalizations.of(context)!.close),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
+      )
+          : selectedRecord == null
+          ? listWidget
+          : detailsWidget,
     );
   }
-
 
   @override
-  Widget build(BuildContext context) {
-    return _reactiveLayout(context);
+  Widget build(BuildContext context) => _reactiveLayout(context);
   }
-}
+

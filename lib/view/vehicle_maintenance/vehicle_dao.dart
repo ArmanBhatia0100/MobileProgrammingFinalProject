@@ -1,6 +1,6 @@
 import 'package:floor/floor.dart';
 import 'vehicle.dart';
-
+/// This is the database class for the Vehicle Maintenance table
 @dao
 abstract class VehicleDao {
   @Query('SELECT * FROM MaintenanceRecord')

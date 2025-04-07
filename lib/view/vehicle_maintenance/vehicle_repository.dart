@@ -1,5 +1,5 @@
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
-
+/// This class is responsible for saving and loading vehicle maintenance records
 class VehicleRepository {
   final _prefs = EncryptedSharedPreferences();
 
@@ -9,7 +9,7 @@ class VehicleRepository {
   static const String keyDate = 'service_date';
   static const String keyMileage = 'vehicle_mileage';
   static const String keyCost = 'vehicle_cost';
-
+/// This method saves the last vehicle maintenance record
   Future<void> saveLastRecord({
     required String name,
     required String type,
@@ -17,7 +17,9 @@ class VehicleRepository {
     required String date,
     required String mileage,
     required String cost,
-  }) async {
+  })
+  /// Saves the last vehicle maintenance record to encrypted shared preferences
+  async {
     await _prefs.setString(keyName, name);
     await _prefs.setString(keyType, type);
     await _prefs.setString(keyServiceType, serviceType);
@@ -25,7 +27,7 @@ class VehicleRepository {
     await _prefs.setString(keyMileage, mileage);
     await _prefs.setString(keyCost, cost);
   }
-
+/// This method loads the last vehicle maintenance record
   Future<Map<String, String>> loadLastRecord() async {
     final name = await _prefs.getString(keyName) ?? '';
     final type = await _prefs.getString(keyType) ?? '';

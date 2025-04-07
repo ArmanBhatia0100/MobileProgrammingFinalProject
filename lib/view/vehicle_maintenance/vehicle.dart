@@ -1,7 +1,7 @@
 // Represents a record for vehicle maintenance
 
 import 'package:floor/floor.dart';
-
+/// This is the database class for the Vehicle Maintenance table
 @entity
 class MaintenanceRecord {
   @PrimaryKey(autoGenerate: true)
@@ -13,7 +13,7 @@ class MaintenanceRecord {
   final String serviceDate;
   final int mileage;
   final double cost;
-
+  /// Constructor for the MaintenanceRecord entity
   MaintenanceRecord({
     this.id,
     required this.vehicleName,

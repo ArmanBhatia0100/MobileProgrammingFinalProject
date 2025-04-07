@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mobile_programming_final_project/view/vehicle_maintenance/vehicle.dart';
 import 'vehicle_repository.dart';
-
+/// Represents a form for adding or editing vehicle maintenance records
 class VehicleMaintenanceForm extends StatefulWidget {
   final MaintenanceRecord? record; // null = add, not null = edit
   final Function(MaintenanceRecord) onSave;
-
+/// Constructor for the VehicleMaintenanceForm
   const VehicleMaintenanceForm({
     super.key,
     this.record,
@@ -16,7 +16,7 @@ class VehicleMaintenanceForm extends StatefulWidget {
   @override
   State<VehicleMaintenanceForm> createState() => _VehicleMaintenanceFormState();
 }
-
+/// State class for VehicleMaintenanceForm
 class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
   late final TextEditingController _nameController;
   late final TextEditingController _typeController;
@@ -27,7 +27,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
   late final VehicleRepository repository;
 
   final _formKey = GlobalKey<FormState>();
-
+/// Initialize controllers and repository
   @override
   void initState() {
     super.initState();
@@ -42,7 +42,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
 
     repository = VehicleRepository();
   }
-
+/// Dispose controllers to free up resources
   @override
   void dispose() {
     _nameController.dispose();
@@ -53,7 +53,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
     _costController.dispose();
     super.dispose();
   }
-
+/// Submit the form data
   Future<void> _submitForm() async {
     try {
       final mileage = int.parse(_mileageController.text.trim());
@@ -68,7 +68,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
         mileage: mileage,
         cost: cost,
       );
-
+/// Save the record to the database
       await repository.saveLastRecord(
         name: _nameController.text,
         type: _typeController.text,
@@ -77,7 +77,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
         mileage: _mileageController.text,
         cost: _costController.text,
       );
-
+/// Call the onSave callback
       widget.onSave(record);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -85,7 +85,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
       );
     }
   }
-
+/// Load previous data from the repository
   Future<void> _loadPreviousData() async {
     final data = await repository.loadLastRecord();
     setState(() {
@@ -98,23 +98,26 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
     });
   }
 
-
+/// Build the form UI
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-
+/// Set the title based on whether it's adding or editing a record
     return Scaffold(
+      /// AppBar with title and action buttons
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Text(widget.record == null
             ? localizations.addMaintenance
             : localizations.editMaintenance),
         actions: [
+          /// Button to load previous data
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: localizations.loadPrevious,
             onPressed: _loadPreviousData,
           ),
+          /// Button to save the form
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
@@ -126,6 +129,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
           )
         ],
       ),
+      /// Main body of the form
       body: SafeArea(
         child: Scrollbar(
           thumbVisibility: true,
@@ -133,27 +137,32 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
             padding: const EdgeInsets.all(30.0),
             child: Form(
               key: _formKey,
+              /// Form fields for vehicle details
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  /// TextFormField for vehicle name
                   TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(labelText: localizations.vehicleName),
                     validator: (value) =>
                     value == null || value.isEmpty ? localizations.emptyValue : null,
                   ),
+                  /// TextFormField for vehicle type
                   TextFormField(
                     controller: _typeController,
                     decoration: InputDecoration(labelText: localizations.vehicleType),
                     validator: (value) =>
                     value == null || value.isEmpty ? localizations.emptyValue : null,
                   ),
+                  /// TextFormField for service type
                   TextFormField(
                     controller: _serviceTypeController,
                     decoration: InputDecoration(labelText: localizations.serviceType),
                     validator: (value) =>
                     value == null || value.isEmpty ? localizations.emptyValue : null,
                   ),
+                  /// Date picker for service date
                   GestureDetector(
                     onTap: () async {
                       final pickedDate = await showDatePicker(
@@ -168,6 +177,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
                         });
                       }
                     },
+                    /// TextFormField for service date
                     child: AbsorbPointer(
                       child: TextFormField(
                         controller: _dateController,
@@ -181,6 +191,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
                       ),
                     ),
                   ),
+                  /// TextFormField for mileage
                   TextFormField(
                     controller: _mileageController,
                     keyboardType: TextInputType.number,
@@ -188,6 +199,7 @@ class _VehicleMaintenanceFormState extends State<VehicleMaintenanceForm> {
                     validator: (value) =>
                     value == null || value.isEmpty ? localizations.emptyValue : null,
                   ),
+                  /// TextFormField for cost
                   TextFormField(
                     controller: _costController,
                     keyboardType: TextInputType.number,

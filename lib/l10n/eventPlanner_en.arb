@@ -51,5 +51,29 @@
   "enterTime": "Please select a time",
   "location": "Location:",
   "enterLocation": "Please enter a location",
-  "areYouSureYouWantToDelete": "Are you sure you want to delete this event?"
+  "areYouSureYouWantToDelete": "Are you sure you want to delete this event?",
+  "vehicleRecords": "Vehicle Maintenance Records",
+  "@vehicleRecords": {
+    "description": "Title for the vehicle maintenance page"
+  },
+  "addMaintenance": "Add Maintenance",
+  "editMaintenance": "Edit Maintenance",
+  "deleteMaintenance": "Delete Maintenance",
+  "maintenanceDetails": "Maintenance Details",
+  "vehicle": "Vehicle",
+  "type": "Type",
+  "service": "Service",
+  "vehicleName": "Vehicle Name",
+  "vehicleType": "Vehicle Type",
+  "serviceType": "Service Type",
+  "serviceDate": "Service Date",
+  "mileage": "Mileage",
+  "cost": "Cost",
+  "update": "Update",
+  "loadPrevious": "Load Previous",
+  "invalidInputMessage": "Please enter valid mileage and cost values.",
+  "vehicleInstructions": "1. Press + to add a new maintenance record.\n\n2. Tap on a record to view and manage it.",
+  "deletedMessage": "Record deleted successfully.",
+  "deleteRecord": "Delete Record"
+
 }

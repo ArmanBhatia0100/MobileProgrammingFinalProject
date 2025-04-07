@@ -3,10 +3,15 @@ import 'vehicle.dart'; // Model
 import 'vehicle_database.dart'; // Floor DB
 import 'vehicle_dao.dart'; // DAO
 import 'vehicle_maintenance_form.dart'; // Form screen
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // Week 9/Final Project: Home Page to list all vehicle maintenance records
 class VehicleMaintenanceHome extends StatefulWidget {
-  const VehicleMaintenanceHome({super.key});
+  final void Function(Locale) onLocaleChange;
+  const VehicleMaintenanceHome({
+    super.key,
+    required this.onLocaleChange,
+  });
 
   @override
   State<VehicleMaintenanceHome> createState() => _VehicleMaintenanceHomeState();
@@ -39,17 +44,39 @@ class _VehicleMaintenanceHomeState extends State<VehicleMaintenanceHome> {
   }
 
   Future<void> _deleteRecord(MaintenanceRecord record) async {
-    final messenger = ScaffoldMessenger.of(context); // Save early
-
-    await dao.deleteRecord(record);
-    await _loadRecords();
-    setState(() {
-      selectedRecord = null;
-    });
-
-    messenger.showSnackBar(
-      const SnackBar(content: Text("Record deleted")),
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.deleteRecord),
+        content: Text(AppLocalizations.of(context)!.confirmDelete),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(AppLocalizations.of(context)!.delete),
+          ),
+        ],
+      ),
     );
+
+    if (confirm == true) {
+      final messenger = ScaffoldMessenger.of(context);
+      await dao.deleteRecord(record);
+      await _loadRecords();
+      if (!mounted) return;
+      setState(() {
+        selectedRecord = null;
+      });
+      messenger.showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.deletedMessage)),
+      );
+    }
+  }
+  void _changeLanguage(Locale locale) {
+    widget.onLocaleChange(locale);
   }
 
 
@@ -107,7 +134,25 @@ class _VehicleMaintenanceHomeState extends State<VehicleMaintenanceHome> {
 
   Widget _buildList() {
     return Scaffold(
-      appBar: AppBar(title: const Text("Vehicle Maintenance Records")),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.vehicleRecords),
+        actions: [
+          PopupMenuButton<Locale>(
+            icon: const Icon(Icons.help_outline),
+            onSelected: _changeLanguage,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: const Locale('en'),
+                child: const Text('English'),
+              ),
+              PopupMenuItem(
+                value: const Locale('fr'),
+                child: const Text('Français'),
+              ),
+            ],
+          ),
+        ],
+      ),
       body: records.isEmpty
           ? const Center(child: Text("No records found"))
           : ListView.builder(
@@ -134,7 +179,30 @@ class _VehicleMaintenanceHomeState extends State<VehicleMaintenanceHome> {
 
   Widget _buildDetails(MaintenanceRecord record) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Maintenance Details")),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.maintenanceDetails),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            tooltip: AppLocalizations.of(context)!.instructionsTitle,
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(AppLocalizations.of(context)!.instructionsTitle),
+                  content: Text(AppLocalizations.of(context)!.vehicleInstructions),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(AppLocalizations.of(context)!.ok),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -151,18 +219,18 @@ class _VehicleMaintenanceHomeState extends State<VehicleMaintenanceHome> {
               children: [
                 ElevatedButton(
                   onPressed: () => _navigateToForm(record: record),
-                  child: const Text("Update"),
+                  child: Text(AppLocalizations.of(context)!.update),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () => _deleteRecord(record),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: const Text("Delete"),
+                  child: Text(AppLocalizations.of(context)!.delete),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () => setState(() => selectedRecord = null),
-                  child: const Text("Close"),
+                  child: Text(AppLocalizations.of(context)!.close),
                 ),
               ],
             )
@@ -171,6 +239,7 @@ class _VehicleMaintenanceHomeState extends State<VehicleMaintenanceHome> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

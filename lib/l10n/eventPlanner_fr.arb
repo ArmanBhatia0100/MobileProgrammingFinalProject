@@ -47,5 +47,28 @@
   "eventDescription": "Description de l'événement",
   "add": "Ajouter",
   "save": "Enregistrer",
-  "areYouSureYouWantToDelete": "Êtes-vous sûr de vouloir supprimer cet événement ?"
+  "areYouSureYouWantToDelete": "Êtes-vous sûr de vouloir supprimer cet événement ?",
+  "vehicleRecords": "Historique d'entretien du véhicule",
+  "@vehicleRecords": {
+    "description": "Titre de la page d'entretien du véhicule"
+  },
+  "vehicleName": "Nom du véhicule",
+  "vehicleType": "Type de véhicule",
+  "serviceType": "Type de service",
+  "serviceDate": "Date d'entretien",
+  "addMaintenance": "Ajouter un entretien",
+  "editMaintenance": "Modifier l'entretien",
+  "deleteMaintenance": "Supprimer l'entretien",
+  "maintenanceDetails": "Détails de l'entretien",
+  "vehicle": "Véhicule",
+  "type": "Type",
+  "service": "Service",
+  "mileage": "Kilométrage",
+  "cost": "Coût",
+  "update": "Modifier",
+  "loadPrevious": "Charger les données précédentes",
+  "invalidInputMessage": "Veuillez entrer un kilométrage et un coût valides.",
+  "vehicleInstructions": "1. Appuyez sur + pour ajouter un nouvel enregistrement d'entretien.\n\n2. Appuyez sur un enregistrement pour le consulter et le gérer.",
+  "deletedMessage": "Enregistrement supprimé avec succès.",
+  "deleteRecord": "Supprimer l'enregistrement"
 }

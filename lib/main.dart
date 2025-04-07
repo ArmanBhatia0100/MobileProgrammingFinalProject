@@ -6,6 +6,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerForm.dart';
 import 'package:mobile_programming_final_project/view/eventPlanner/EventPlannerHome.dart';
 import 'package:mobile_programming_final_project/view/eventPlanner/eventdatabase.dart';
+import 'package:mobile_programming_final_project/view/vehicle_maintenance/vehicle_maintenance_home.dart';
+import 'package:mobile_programming_final_project/view/vehicle_maintenance/vehicle_maintenance_form.dart';
 import 'pages/home_page.dart';
 import 'pages/expense_page.dart';
 import 'pages/add_expense.dart';
@@ -85,6 +87,13 @@ class _MyAppState extends State<MyApp> {
         "/customer":(context)=> CustomerListHome(
           onLocaleChange: _changeLocale,
         ),
+        '/vehicle': (context) => VehicleMaintenanceHome(
+          onLocaleChange: _changeLocale,
+        ),
+        '/vehicle-form': (context) => VehicleMaintenanceForm(
+          onSave: (_) {}, // placeholder; actual use will override via
+        ),
+
       },
     );
   }
@@ -124,8 +133,8 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text("Expense Tracker"),
             ),
             OutlinedButton(
-              onPressed: () {},
-              child: const Text("Page 3"),
+              onPressed: ()  => Navigator.pushNamed(context, "/vehicle"),
+              child: const Text("Vehicle Maintenance"),
             ),
           ],
         ),
